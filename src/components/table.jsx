@@ -1,11 +1,10 @@
 import React from "react";
-import { useTable, useSortBy, useRowSelect } from "react-table";
+import { useTable, useSortBy, useRowSelect, useFlexLayout } from "react-table";
 import { Checkbox } from "@shopify/polaris";
 import { tw } from "twind";
 
 const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, checked, title, onChange }, ref) => {
-    console.log(indeterminate);
     return (
       <Checkbox
         ariaControls={title}
@@ -71,6 +70,7 @@ export function Table({ data }) {
     { columns, data: tableData, getRowId },
     useSortBy,
     useRowSelect,
+    useFlexLayout,
     (hooks) => {
       hooks.visibleColumns.push((columns) => [
         // Let's make a column for selection
@@ -97,16 +97,15 @@ export function Table({ data }) {
   );
 
   return (
-    <div className="">
-      {JSON.stringify(selectedRowIds)}
-      <table className={tw`w-full`} {...getTableProps()}>
-        <thead>
+    <div className={tw`relative w-full h-full`}>
+      <table className={tw`w-full relative`} {...getTableProps()}>
+        <thead className={tw`relative sticky top-0 bg-white z-10`}>
           {headerGroups.map((headerGroup) => (
-            <tr {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column, index) => {
+            <tr className={tw`relative`} {...headerGroup.getHeaderGroupProps()}>
+              {headerGroup.headers.map((column) => {
                 return (
                   <th
-                    className={tw`text-left`}
+                    className={tw`text-left p-4 bg-white`}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                   >
                     {column.render("Header")}
@@ -130,7 +129,7 @@ export function Table({ data }) {
               <tr className="" {...row.getRowProps()}>
                 {row.cells.map((cell, index) => {
                   return (
-                    <td className="" {...cell.getCellProps()}>
+                    <td className={tw`p-4`} {...cell.getCellProps()}>
                       {cell.render("Cell")}
                     </td>
                   );
