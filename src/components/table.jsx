@@ -65,21 +65,30 @@ export function Table({ data }) {
           const { original } = row;
           const formatted = new Intl.NumberFormat().format(original.inventory);
           return (
-            <div className={tw`flex items-center`}>{formatted} in stock</div>
+            <div className={tw`flex items-center`}>
+              <span
+                className={tw`${
+                  original.inventory < 0 && "bg-yellow-200"
+                } inline-block mr-1`}
+              >
+                {formatted}{" "}
+              </span>{" "}
+              in stock
+            </div>
           );
         },
       },
       {
         Header: "Replenishment Interval",
         accessor: "interval",
-        minWidth: 70,
+        minWidth: 180,
         Cell: ({ row }) => {
           const { original } = row;
           return (
             <div className={tw`flex items-center z-0`}>
               <TextField
                 type="number"
-                value={String(original.inventory)}
+                value={String(original.interval)}
                 onChange={() => {
                   console.log("change");
                 }}
@@ -92,7 +101,7 @@ export function Table({ data }) {
       {
         Header: "Online Store Status",
         accessor: "status",
-        width: 120,
+        width: 160,
         Cell: ({ row }) => {
           const { original } = row;
           return (
@@ -105,7 +114,7 @@ export function Table({ data }) {
       {
         Header: "Repeat Sales Channel",
         accessor: "channel",
-        width: 120,
+        width: 170,
         Cell: ({ row }) => {
           const { original } = row;
           return (
@@ -167,25 +176,28 @@ export function Table({ data }) {
           className={tw`relative sticky top-0 bg-white z-10 flex-shrink-0 h-[58px] flex`}
         >
           {numRowsSelected > 0 && (
-            <div
+            <tr
               className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4 border-b`}
             >
-              <ButtonGroup segmented>
-                <Button
-                  onClick={() => toggleAllRowsSelected(false)}
-                  size="slim"
-                >
-                  <div className={tw`flex items-center`}>
-                    <div className={tw`pointer-events-none flex`}>
-                      <Checkbox checked />
+              <th>
+                <ButtonGroup segmented>
+                  <Button
+                    onClick={() => toggleAllRowsSelected(false)}
+                    size="slim"
+                  >
+                    <div className={tw`flex items-center`}>
+                      <div className={tw`pointer-events-none flex`}>
+                        <Checkbox checked />
+                      </div>
+                      {numRowsSelected} selected
                     </div>
-                    {numRowsSelected} selected
-                  </div>
-                </Button>
-                <Button>Italic</Button>
-                <Button>Underline</Button>
-              </ButtonGroup>
-            </div>
+                  </Button>
+                  <Button>Create Featured Product Cart</Button>
+                  <Button>Create QR Code</Button>
+                  <Button disclosure>More actions</Button>
+                </ButtonGroup>
+              </th>
+            </tr>
           )}
           {headerGroups.map((headerGroup) => (
             <tr className={tw`relative`} {...headerGroup.getHeaderGroupProps()}>
