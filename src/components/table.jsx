@@ -2,6 +2,8 @@ import React from "react";
 import { useTable, useSortBy, useRowSelect, useFlexLayout } from "react-table";
 import {
   Badge,
+  Button,
+  ButtonGroup,
   Checkbox,
   Icon,
   TextField,
@@ -15,6 +17,8 @@ const IndeterminateCheckbox = React.forwardRef(
   ({ indeterminate, checked, title, onChange }, ref) => {
     return (
       <Checkbox
+        label={title}
+        labelHidden
         ariaControls={title}
         checked={indeterminate ? "indeterminate" : checked}
         ref={ref}
@@ -136,14 +140,14 @@ export function Table({ data }) {
         // Let's make a column for selection
         {
           id: "selection",
-          width: 40,
+          width: 60,
           Header: ({ getToggleAllRowsSelectedProps }) => (
-            <div>
+            <div className={tw`flex items-center pl-4`}>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
           Cell: ({ row }) => (
-            <div>
+            <div className={tw`flex items-center pl-4`}>
               <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />
             </div>
           ),
@@ -153,10 +157,30 @@ export function Table({ data }) {
     }
   );
 
+  const numRowsSelected = Object.keys(selectedRowIds).length;
+
   return (
     <div className={tw`relative w-full h-full`}>
       <table className={tw`w-full relative`} {...getTableProps()}>
         <thead className={tw`relative sticky top-0 bg-white z-10`}>
+          {numRowsSelected > 0 && (
+            <div
+              className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4`}
+            >
+              <ButtonGroup segmented>
+                <Button size="slim">
+                  <div className={tw`flex items-center`}>
+                    <div className={tw`pointer-events-none flex`}>
+                      <Checkbox checked />
+                    </div>
+                    {numRowsSelected} selected
+                  </div>
+                </Button>
+                <Button>Italic</Button>
+                <Button>Underline</Button>
+              </ButtonGroup>
+            </div>
+          )}
           {headerGroups.map((headerGroup) => (
             <tr className={tw`relative`} {...headerGroup.getHeaderGroupProps()}>
               {headerGroup.headers.map((column) => {
