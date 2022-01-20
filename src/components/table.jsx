@@ -1,6 +1,7 @@
 import React from "react";
 import { useTable, useSortBy, useRowSelect, useFlexLayout } from "react-table";
-import { Checkbox } from "@shopify/polaris";
+import { Checkbox, Icon } from "@shopify/polaris";
+import { CaretUpMinor, CaretDownMinor } from "@shopify/polaris-icons";
 import { tw } from "twind";
 
 const IndeterminateCheckbox = React.forwardRef(
@@ -105,16 +106,22 @@ export function Table({ data }) {
               {headerGroup.headers.map((column) => {
                 return (
                   <th
-                    className={tw`text-left p-4 bg-white`}
+                    className={tw`text-left p-4 bg-white font-medium border-b flex items-center select-none`}
                     {...column.getHeaderProps(column.getSortByToggleProps())}
                   >
                     {column.render("Header")}
-                    <span>
-                      {column.isSorted
-                        ? column.isSortedDesc
-                          ? " 🔽"
-                          : " 🔼"
-                        : ""}
+                    <span
+                      className={tw`top-px relative inline-flex items-center justify-center`}
+                    >
+                      {column.isSorted ? (
+                        column.isSortedDesc ? (
+                          <Icon source={CaretDownMinor} color="base" />
+                        ) : (
+                          <Icon source={CaretUpMinor} color="base" />
+                        )
+                      ) : (
+                        ""
+                      )}
                     </span>
                   </th>
                 );
@@ -126,10 +133,15 @@ export function Table({ data }) {
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <tr className="" {...row.getRowProps()}>
-                {row.cells.map((cell, index) => {
+              <tr className={tw`border-t`} {...row.getRowProps()}>
+                {row.cells.map((cell) => {
                   return (
-                    <td className={tw`p-4`} {...cell.getCellProps()}>
+                    <td
+                      className={tw`px-4 py-2 flex ${
+                        cell.column.id === "selection" ? "items-center" : ""
+                      }`}
+                      {...cell.getCellProps()}
+                    >
                       {cell.render("Cell")}
                     </td>
                   );
