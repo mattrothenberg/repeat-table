@@ -1,5 +1,3 @@
-import React from "react";
-import { useTable, useSortBy, useRowSelect, useFlexLayout } from "react-table";
 import {
   Badge,
   Button,
@@ -10,7 +8,9 @@ import {
   TextStyle,
   Thumbnail,
 } from "@shopify/polaris";
-import { CaretUpMinor, CaretDownMinor } from "@shopify/polaris-icons";
+import { CaretDownMinor, CaretUpMinor } from "@shopify/polaris-icons";
+import React, { useEffect } from "react";
+import { useFlexLayout, useRowSelect, useSortBy, useTable } from "react-table";
 import { tw } from "twind";
 
 const IndeterminateCheckbox = React.forwardRef(
@@ -34,9 +34,7 @@ const IndeterminateCheckbox = React.forwardRef(
   }
 );
 
-export function Table({ data }) {
-  const tableData = React.useMemo(() => data, [data]);
-
+export function Table({ data, onUpdateData }) {
   const columns = React.useMemo(
     () => [
       {
@@ -82,15 +80,21 @@ export function Table({ data }) {
         Header: "Replenishment Interval",
         accessor: "interval",
         minWidth: 180,
-        Cell: ({ row }) => {
-          const { original } = row;
+        Cell: ({ row, value, onUpdateData: updateFunc }) => {
+          const [localValue, setLocalValue] = React.useState(String(value));
+
+          useEffect(() => {
+            setLocalValue(String(value));
+          }, [value]);
+
           return (
             <div className={tw`flex items-center z-0`}>
               <TextField
                 type="number"
-                value={String(original.interval)}
-                onChange={() => {
-                  console.log("change");
+                value={localValue}
+                onChange={(value) => {
+                  setLocalValue(value);
+                  onUpdateData(row.id, value);
                 }}
                 autoComplete="off"
               />
@@ -141,7 +145,7 @@ export function Table({ data }) {
     state: { selectedRowIds },
     toggleAllRowsSelected,
   } = useTable(
-    { columns, data: tableData, getRowId },
+    { columns, data, getRowId, onUpdateData },
     useSortBy,
     useRowSelect,
     useFlexLayout,
@@ -170,90 +174,95 @@ export function Table({ data }) {
   const numRowsSelected = Object.keys(selectedRowIds).length;
 
   return (
-    <div className={tw`relative w-full h-full`}>
-      <table className={tw`w-full relative`} {...getTableProps()}>
-        <thead
-          className={tw`relative sticky top-0 bg-white z-10 flex-shrink-0 h-[58px] flex`}
-        >
-          {numRowsSelected > 0 && (
-            <tr
-              className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4 border-b`}
-            >
-              <th>
-                <ButtonGroup segmented>
-                  <Button
-                    onClick={() => toggleAllRowsSelected(false)}
-                    size="slim"
-                  >
-                    <div className={tw`flex items-center`}>
-                      <div className={tw`pointer-events-none flex`}>
-                        <Checkbox checked />
-                      </div>
-                      {numRowsSelected} selected
-                    </div>
-                  </Button>
-                  <Button>Create Featured Product Cart</Button>
-                  <Button>Create QR Code</Button>
-                  <Button disclosure>More actions</Button>
-                </ButtonGroup>
-              </th>
-            </tr>
-          )}
-          {headerGroups.map((headerGroup) => (
-            <tr className={tw`relative`} {...headerGroup.getHeaderGroupProps()}>
-              {headerGroup.headers.map((column) => {
-                return (
-                  <th
-                    className={tw`text-left p-4 bg-white font-medium border-b flex items-center select-none`}
-                    {...column.getHeaderProps(column.getSortByToggleProps())}
-                  >
-                    {column.render("Header")}
-                    <span
-                      className={tw`top-px relative inline-flex items-center justify-center`}
-                    >
-                      {column.isSorted ? (
-                        column.isSortedDesc ? (
-                          <Icon source={CaretDownMinor} color="base" />
-                        ) : (
-                          <Icon source={CaretUpMinor} color="base" />
-                        )
-                      ) : (
-                        ""
-                      )}
-                    </span>
-                  </th>
-                );
-              })}
-            </tr>
-          ))}
-        </thead>
-        <tbody {...getTableBodyProps()}>
-          {rows.map((row) => {
-            prepareRow(row);
-            return (
+    <>
+      <div className={tw`relative w-full h-full`}>
+        <table className={tw`w-full relative`} {...getTableProps()}>
+          <thead
+            className={tw`relative sticky top-0 bg-white z-10 flex-shrink-0 h-[58px] flex`}
+          >
+            {numRowsSelected > 0 && (
               <tr
-                className={tw`border-t ${
-                  row.isSelected ? "bg-blue-50" : "bg-white"
-                }`}
-                {...row.getRowProps()}
+                className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4 border-b`}
               >
-                {row.cells.map((cell) => {
-                  return (
-                    <td
-                      className={tw`px-4 py-2 flex ${
-                        cell.column.id === "selection" ? "items-center" : ""
-                      }`}
-                      {...cell.getCellProps()}
+                <th>
+                  <ButtonGroup segmented>
+                    <Button
+                      onClick={() => toggleAllRowsSelected(false)}
+                      size="slim"
                     >
-                      {cell.render("Cell")}
-                    </td>
+                      <div className={tw`flex items-center`}>
+                        <div className={tw`pointer-events-none flex`}>
+                          <Checkbox checked />
+                        </div>
+                        {numRowsSelected} selected
+                      </div>
+                    </Button>
+                    <Button>Create Featured Product Cart</Button>
+                    <Button>Create QR Code</Button>
+                    <Button disclosure>More actions</Button>
+                  </ButtonGroup>
+                </th>
+              </tr>
+            )}
+            {headerGroups.map((headerGroup) => (
+              <tr
+                className={tw`relative`}
+                {...headerGroup.getHeaderGroupProps()}
+              >
+                {headerGroup.headers.map((column) => {
+                  return (
+                    <th
+                      className={tw`text-left p-4 bg-white font-medium border-b flex items-center select-none`}
+                      {...column.getHeaderProps(column.getSortByToggleProps())}
+                    >
+                      {column.render("Header")}
+                      <span
+                        className={tw`top-px relative inline-flex items-center justify-center`}
+                      >
+                        {column.isSorted ? (
+                          column.isSortedDesc ? (
+                            <Icon source={CaretDownMinor} color="base" />
+                          ) : (
+                            <Icon source={CaretUpMinor} color="base" />
+                          )
+                        ) : (
+                          ""
+                        )}
+                      </span>
+                    </th>
                   );
                 })}
               </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+            ))}
+          </thead>
+          <tbody {...getTableBodyProps()}>
+            {rows.map((row) => {
+              prepareRow(row);
+              return (
+                <tr
+                  className={tw`border-t ${
+                    row.isSelected ? "bg-blue-50" : "bg-white"
+                  }`}
+                  {...row.getRowProps()}
+                >
+                  {row.cells.map((cell) => {
+                    return (
+                      <td
+                        className={tw`px-4 py-2 flex ${
+                          cell.column.id === "selection" ? "items-center" : ""
+                        }`}
+                        {...cell.getCellProps()}
+                      >
+                        {cell.render("Cell")}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

@@ -3,13 +3,15 @@ import ReactDOM from "react-dom";
 import "./index.css";
 import App from "./App";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import { AppProvider } from "@shopify/polaris";
+import { AppProvider, Frame } from "@shopify/polaris";
 import "@shopify/polaris/build/esm/styles.css";
 
 ReactDOM.render(
   <React.StrictMode>
     <AppProvider i18n={enTranslations}>
-      <App />
+      <Frame>
+        <App />
+      </Frame>
     </AppProvider>
   </React.StrictMode>,
   document.getElementById("root")
