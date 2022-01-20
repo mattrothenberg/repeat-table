@@ -1,6 +1,13 @@
 import React from "react";
 import { useTable, useSortBy, useRowSelect, useFlexLayout } from "react-table";
-import { Checkbox, Icon } from "@shopify/polaris";
+import {
+  Badge,
+  Checkbox,
+  Icon,
+  TextField,
+  TextStyle,
+  Thumbnail,
+} from "@shopify/polaris";
 import { CaretUpMinor, CaretDownMinor } from "@shopify/polaris-icons";
 import { tw } from "twind";
 
@@ -29,28 +36,80 @@ export function Table({ data }) {
   const columns = React.useMemo(
     () => [
       {
-        Header: "ID",
+        Header: "Title ID / Variant ID",
         accessor: "id",
+        width: 300,
+        Cell: ({ row }) => {
+          const { original } = row;
+          return (
+            <div className={tw`py-4 flex items-center`}>
+              <Thumbnail size="medium" source={original.photo} />
+              <div className={tw`ml-4`}>
+                <TextStyle variation="strong">{original.title}</TextStyle>
+                <p>
+                  {original.variantId} / {original.titleId}
+                </p>
+              </div>
+            </div>
+          );
+        },
       },
       {
-        Header: "URL",
-        accessor: "url",
+        Header: "Inventory",
+        accessor: "inventory",
+        Cell: ({ row }) => {
+          const { original } = row;
+          const formatted = new Intl.NumberFormat().format(original.inventory);
+          return (
+            <div className={tw`flex items-center`}>{formatted} in stock</div>
+          );
+        },
       },
       {
-        Header: "Name",
-        accessor: "name",
+        Header: "Replenishment Interval",
+        accessor: "interval",
+        minWidth: 70,
+        Cell: ({ row }) => {
+          const { original } = row;
+          return (
+            <div className={tw`flex items-center z-0`}>
+              <TextField
+                type="number"
+                value={String(original.inventory)}
+                onChange={() => {
+                  console.log("change");
+                }}
+                autoComplete="off"
+              />
+            </div>
+          );
+        },
       },
       {
-        Header: "Location",
-        accessor: "location",
+        Header: "Online Store Status",
+        accessor: "status",
+        width: 120,
+        Cell: ({ row }) => {
+          const { original } = row;
+          return (
+            <div className={tw`flex items-center`}>
+              <Badge status="success">{original.status}</Badge>
+            </div>
+          );
+        },
       },
       {
-        Header: "Orders",
-        accessor: "orders",
-      },
-      {
-        Header: "Amount Spent",
-        accessor: "amountSpent",
+        Header: "Repeat Sales Channel",
+        accessor: "channel",
+        width: 120,
+        Cell: ({ row }) => {
+          const { original } = row;
+          return (
+            <div className={tw`flex items-center`}>
+              <Badge status="success">{original.channel}</Badge>
+            </div>
+          );
+        },
       },
     ],
     []
@@ -77,15 +136,12 @@ export function Table({ data }) {
         // Let's make a column for selection
         {
           id: "selection",
-          // The header can use the table's getToggleAllRowsSelectedProps method
-          // to render a checkbox
+          width: 40,
           Header: ({ getToggleAllRowsSelectedProps }) => (
             <div>
               <IndeterminateCheckbox {...getToggleAllRowsSelectedProps()} />
             </div>
           ),
-          // The cell can use the individual row's getToggleRowSelectedProps method
-          // to the render a checkbox
           Cell: ({ row }) => (
             <div>
               <IndeterminateCheckbox {...row.getToggleRowSelectedProps()} />

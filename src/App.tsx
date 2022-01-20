@@ -1,9 +1,9 @@
 import {
   randUuid,
-  randUrl,
   randFullName,
-  randCity,
   randNumber,
+  randProductName,
+  randImg,
 } from "@ngneat/falso";
 import {
   Button,
@@ -19,12 +19,15 @@ import { Table } from "./components/table";
 
 const data = Array.from({ length: 20 }).map((_, i) => {
   return {
-    id: randUuid(),
-    url: randUrl(),
-    name: randFullName(),
-    location: randCity(),
-    orders: randNumber(),
-    amountSpent: randNumber(),
+    id: randNumber({ length: 2 }),
+    photo: randImg(),
+    title: randProductName(),
+    titleId: randNumber({ length: 2 }),
+    variantId: randNumber({ length: 2 }),
+    inventory: randNumber({ max: 10, min: 1 }),
+    interval: randNumber({ max: 30, min: 1 }),
+    status: "Active",
+    channel: "Available",
   };
 });
 
@@ -36,7 +39,6 @@ function App() {
       key: "status",
       label: "Online Store Status",
       shortcut: true,
-
       filter: (
         <ChoiceList
           title="Online Store Status"
