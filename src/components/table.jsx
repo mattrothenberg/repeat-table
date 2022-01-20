@@ -130,6 +130,7 @@ export function Table({ data }) {
     rows,
     prepareRow,
     state: { selectedRowIds },
+    toggleAllRowsSelected,
   } = useTable(
     { columns, data: tableData, getRowId },
     useSortBy,
@@ -162,13 +163,18 @@ export function Table({ data }) {
   return (
     <div className={tw`relative w-full h-full`}>
       <table className={tw`w-full relative`} {...getTableProps()}>
-        <thead className={tw`relative sticky top-0 bg-white z-10`}>
+        <thead
+          className={tw`relative sticky top-0 bg-white z-10 flex-shrink-0 h-[58px] flex`}
+        >
           {numRowsSelected > 0 && (
             <div
-              className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4`}
+              className={tw`absolute inset-0 w-full h-full bg-white z-10 p-4 border-b`}
             >
               <ButtonGroup segmented>
-                <Button size="slim">
+                <Button
+                  onClick={() => toggleAllRowsSelected(false)}
+                  size="slim"
+                >
                   <div className={tw`flex items-center`}>
                     <div className={tw`pointer-events-none flex`}>
                       <Checkbox checked />
@@ -213,7 +219,12 @@ export function Table({ data }) {
           {rows.map((row) => {
             prepareRow(row);
             return (
-              <tr className={tw`border-t`} {...row.getRowProps()}>
+              <tr
+                className={tw`border-t ${
+                  row.isSelected ? "bg-blue-50" : "bg-white"
+                }`}
+                {...row.getRowProps()}
+              >
                 {row.cells.map((cell) => {
                   return (
                     <td
