@@ -124,16 +124,19 @@ function App() {
     });
   }
 
-  const handleUpdateData = (id: string, value: string) => {
-    setData((currData) => {
-      return currData.map((item) => {
-        if (item.id === id) {
-          return { ...item, interval: Number(value) };
-        }
-        return item;
+  const handleUpdateData = useCallback(
+    (id: string, value: string) => {
+      setData((currData) => {
+        return currData.map((item) => {
+          if (item.id === id) {
+            return { ...item, interval: Number(value) };
+          }
+          return item;
+        });
       });
-    });
-  };
+    },
+    [setData]
+  );
 
   const diff = useMemo(() => {
     return differenceWith(data, originalData, isEqual);

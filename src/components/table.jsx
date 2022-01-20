@@ -94,7 +94,7 @@ export function Table({ data, onUpdateData }) {
                 value={localValue}
                 onChange={(value) => {
                   setLocalValue(value);
-                  onUpdateData(row.id, value);
+                  updateFunc(row.id, value);
                 }}
                 autoComplete="off"
               />
@@ -206,13 +206,13 @@ export function Table({ data, onUpdateData }) {
             )}
             {headerGroups.map((headerGroup) => (
               <tr
-                className={tw`relative`}
+                className={tw`relative gap-4 border-b`}
                 {...headerGroup.getHeaderGroupProps()}
               >
                 {headerGroup.headers.map((column) => {
                   return (
                     <th
-                      className={tw`text-left p-4 bg-white font-medium border-b flex items-center select-none`}
+                      className={tw`text-left p-4 bg-white font-medium flex items-center select-none`}
                       {...column.getHeaderProps(column.getSortByToggleProps())}
                     >
                       {column.render("Header")}
@@ -240,7 +240,7 @@ export function Table({ data, onUpdateData }) {
               prepareRow(row);
               return (
                 <tr
-                  className={tw`border-t ${
+                  className={tw`border-t gap-4 ${
                     row.isSelected ? "bg-blue-50" : "bg-white"
                   }`}
                   {...row.getRowProps()}
